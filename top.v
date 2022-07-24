@@ -29,8 +29,8 @@ module t (/*AUTOARG*/
     case (i)
     1:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd1,  8'd8};
     3:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd2,  8'd100};
-    5:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd3,  8'd0};
-    7:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd4,  8'd1};
+    5:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd3,  8'd1};
+    7:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd4,  8'd0};
     9:  {mem[i], mem[i-1]} = {`OP_MVD, 4'd3,  4'd4, 4'd3};
     11: {mem[i], mem[i-1]} = {`OP_ADD, 4'd3,  4'd4, 4'd3};
     13: {mem[i], mem[i-1]} = {`OP_LT,  4'd0,  4'd3, 4'd2};
