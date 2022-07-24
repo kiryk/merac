@@ -68,7 +68,11 @@ module t (/*AUTOARG*/
 				op    <= {mem[dstval+1], mem[dstval]};
 			end
 			`STATE_DECODE: begin
-				$display("pc: %d, opc: %b, opc: %d", pc, op, op[`ARG_OPC]);
+				state   <= `STATE_EXECUTE;
+				dstreg0 <= op[`ARG_SRC0];
+				dstreg1 <= op[`ARG_SRC1];
+			end
+			`STATE_EXECUTE: begin
 				state <= `STATE_STOREPC;
 				case (op[`ARG_OPC])
 					`OP_HLT: begin
@@ -89,9 +93,6 @@ module t (/*AUTOARG*/
 					`OP_CND: begin
 					end
 					`OP_ADD: begin
-						dstreg0 <= op[`ARG_SRC0];
-						dstreg1 <= op[`ARG_SRC1];
-
 						write0  <= 1;
 						srcreg0 <= op[`ARG_DST];
 						srcval0 <= retval;
