@@ -35,26 +35,26 @@ module t (/*AUTOARG*/
 	end
 
 	reg  write0 = 0, write1 = 0;
-	reg  [`WIDTH_SEG-1:0]    srcreg0;
-	reg  [`WIDTH_SEG-1:0]    srcreg1;
-	reg  [`WIDTH_WORD-1:0]   srcval0;
-	reg  [`WIDTH_WORD-1:0]   srcval1;
-	reg  [`WIDTH_SEG-1:0]    dstreg0 = 14;
-	reg  [`WIDTH_SEG-1:0]    dstreg1 = 15;
-	wire [`WIDTH_WORD-1:0]   dstval0;
-	wire [`WIDTH_WORD-1:0]   dstval1;
-	wire [`WIDTH_DOUBLE-1:0] dstval;
+	reg  [`WIDTH_SEG-1:0]    dstreg0;
+	reg  [`WIDTH_SEG-1:0]    dstreg1;
+	reg  [`WIDTH_WORD-1:0]   dstval0;
+	reg  [`WIDTH_WORD-1:0]   dstval1;
+	reg  [`WIDTH_SEG-1:0]    argreg0 = 14;
+	reg  [`WIDTH_SEG-1:0]    argreg1 = 15;
+	wire [`WIDTH_WORD-1:0]   argval0;
+	wire [`WIDTH_WORD-1:0]   argval1;
+	wire [`WIDTH_DOUBLE-1:0] argval;
 	registers r0(clk, write0, write1,
-							 srcreg0, srcval0,
-							 srcreg1, srcval1,
 							 dstreg0, dstval0,
-							 dstreg1, dstval1);
+							 dstreg1, dstval1,
+							 argreg0, argval0,
+							 argreg1, argval1);
 
-	assign dstval = {dstval1, dstval0};
+	assign argval = {argval1, argval0};
 
-	wire [`WIDTH_WORD-1:0] retval;
+	wire [`WIDTH_WORD-1:0] dstval;
 	wire carry;
-	alu a0(op[15], op[14:12], dstval0, dstval1, retval, carry);
+	alu a0(op[15], op[14:12], argval0, argval1, dstval, carry);
 
 	always @(posedge clk) begin
 		case (state)
@@ -65,13 +65,13 @@ module t (/*AUTOARG*/
 			end
 			`STATE_FETCHOP: begin
 				state <= `STATE_DECODE;
-				pc    <= {dstval};
-				op    <= {mem[dstval+1], mem[dstval]};
+				pc    <= {argval};
+				op    <= {mem[argval+1], mem[argval]};
 			end
 			`STATE_DECODE: begin
 				state   <= `STATE_EXECUTE;
-				dstreg0 <= op[`ARG_SRC0];
-				dstreg1 <= op[`ARG_SRC1];
+				argreg0 <= op[`ARG_SRC0];
+				argreg1 <= op[`ARG_SRC1];
 			end
 			`STATE_EXECUTE: begin
 				state <= `STATE_STOREPC;
@@ -82,25 +82,25 @@ module t (/*AUTOARG*/
 					end
 					`OP_LD: begin
 						write0 <= 1;
-						srcreg0 <= op[`ARG_DST];
-						srcval0 <= mem[dstval];
+						dstreg0 <= op[`ARG_DST];
+						dstval0 <= mem[argval];
 					end
 					`OP_ST: begin
 					end
 					`OP_MVC: begin
 						write0  <= 1;
-						srcreg0 <= op[`ARG_DST];
-						srcval0 <= op[`ARG_NUM];
+						dstreg0 <= op[`ARG_DST];
+						dstval0 <= op[`ARG_NUM];
 					end
 					`OP_CALL: begin
 					end
 					`OP_MVD: begin
 						write0 <= 1;
 						write1 <= 1;
-						srcreg0 <= (op[`ARG_DST] + 0);
-						srcreg1 <= (op[`ARG_DST] + 1);
-						srcval0 <= dstval0;
-						srcval1 <= dstval1;
+						dstreg0 <= (op[`ARG_DST] + 0);
+						dstreg1 <= (op[`ARG_DST] + 1);
+						dstval0 <= argval0;
+						dstval1 <= argval1;
 					end
 					`OP_EQ: begin
 					end
@@ -114,8 +114,8 @@ module t (/*AUTOARG*/
 					`OP_NOT,
 					`OP_MV: begin
 						write0  <= 1;
-						srcreg0 <= op[`ARG_DST];
-						srcval0 <= retval;
+						dstreg0 <= op[`ARG_DST];
+						dstval0 <= dstval;
 					end
 					`OP_NOP: begin
 					end
@@ -124,12 +124,12 @@ module t (/*AUTOARG*/
 			`STATE_STOREPC: begin
 				write0  <= 1;
 				write1  <= 1;
-				srcreg0 <= 14;
-				srcreg1 <= 15;
-				{srcval1, srcval0} <= pc + 2;
-
 				dstreg0 <= 14;
 				dstreg1 <= 15;
+				{dstval1, dstval0} <= pc + 2;
+
+				argreg0 <= 14;
+				argreg1 <= 15;
 				state <= `STATE_FETCHPC;
 			end
 		endcase
