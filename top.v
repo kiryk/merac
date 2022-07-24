@@ -78,6 +78,7 @@ module t (/*AUTOARG*/
 				case (op[`ARG_OPC])
 					`OP_HLT: begin
 						pc <= pc - 2;
+						$finish;
 					end
 					`OP_LD: begin
 						write0 <= 1;
@@ -125,7 +126,6 @@ module t (/*AUTOARG*/
 				dstreg1 <= 15;
 				state <= `STATE_FETCHPC;
 			end
-			default: $finish;
 		endcase
 	end
 endmodule
