@@ -12,8 +12,8 @@
 `define OP_HLT  4'b0000
 `define OP_ST   4'b0001
 `define OP_LD   4'b0010
-`define OP_MV   4'b0011
-`define OP_MVD  4'b0100
+`define OP_MVC  4'b0011
+`define OP_CALL 4'b0100
 `define OP_EQ   4'b0101
 `define OP_LT   4'b0110
 `define OP_CND  4'b0111
@@ -22,8 +22,8 @@
 `define OP_AND  4'b1010
 `define OP_OR   4'b1011
 `define OP_NOT  4'b1100
-`define OP_MVC  4'b1101
-`define OP_CALL 4'b1110
+`define OP_MV   4'b1101
+`define OP_MVD  4'b1110
 `define OP_NOP  4'b1111
 
 `define ARG_OPC  15:12

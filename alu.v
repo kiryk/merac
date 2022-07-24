@@ -1,14 +1,16 @@
 `include "const.v"
 
 `define WIDTH_OP 3
-`define ADD 3'b000
-`define SUB 3'b001
-`define AND 3'b010
-`define OR  3'b011
-`define NOT 3'b100
-`define MVC 3'b101
 
-module alu (op, a, b, y, carry);
+`define ADD  3'b000
+`define SUB  3'b001
+`define AND  3'b010
+`define OR   3'b011
+`define NOT  3'b100
+`define MV   3'b101
+
+module alu (active, op, a, b, y, carry);
+	input  wire active;
 	input  wire [`WIDTH_OP-1:0]   op;
 	input  wire [`WIDTH_WORD-1:0] a;
 	input  wire [`WIDTH_WORD-1:0] b;
@@ -17,7 +19,7 @@ module alu (op, a, b, y, carry);
 
 	/* verilator lint_off CASEINCOMPLETE */
 	always @(op, a, b) begin
-		case (op)
+		if (active) case (op)
 			`ADD: begin
 				{carry, y} = a + b;
 			end
@@ -33,7 +35,7 @@ module alu (op, a, b, y, carry);
 			`NOT: begin
 				{carry, y} = {|y, ~a};
 			end
-			`MVC: begin
+			`MV: begin
 				{carry, y} = {|y, a};
 			end
 		endcase

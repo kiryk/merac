@@ -22,6 +22,7 @@ module t (/*AUTOARG*/
 	reg [2:0] state = `STATE_FETCHPC;
 	reg [`WIDTH_DOUBLE-1:0] pc;
 	reg [`WIDTH_DOUBLE-1:0] op;
+	reg [`WIDTH_DOUBLE-1:0] addr;
 
 	integer i;
 	initial for (i = 0; i < 2**`WIDTH_DOUBLE; i = i + 1) begin
@@ -53,7 +54,7 @@ module t (/*AUTOARG*/
 
 	wire [`WIDTH_WORD-1:0] retval;
 	wire carry;
-	alu a0(op[14:12], dstval0, dstval1, retval, carry);
+	alu a0(op[15], op[14:12], dstval0, dstval1, retval, carry);
 
 	always @(posedge clk) begin
 		case (state)
@@ -78,11 +79,19 @@ module t (/*AUTOARG*/
 					`OP_HLT: begin
 						pc <= pc - 2;
 					end
+					`OP_LD: begin
+						write0 <= 1;
+						srcreg0 <= op[`ARG_DST];
+						srcval0 <= mem[dstval];
+					end
 					`OP_ST: begin
 					end
-					`OP_LD: begin
+					`OP_MVC: begin
+						write0  <= 1;
+						srcreg0 <= op[`ARG_DST];
+						srcval0 <= op[`ARG_NUM];
 					end
-					`OP_MV: begin
+					`OP_CALL: begin
 					end
 					`OP_MVD: begin
 					end
@@ -92,25 +101,14 @@ module t (/*AUTOARG*/
 					end
 					`OP_CND: begin
 					end
-					`OP_ADD: begin
+					`OP_ADD,
+					`OP_SUB,
+					`OP_OR,
+					`OP_NOT,
+					`OP_MV: begin
 						write0  <= 1;
 						srcreg0 <= op[`ARG_DST];
 						srcval0 <= retval;
-					end
-					`OP_SUB: begin
-					end
-					`OP_AND: begin
-					end
-					`OP_OR: begin
-					end
-					`OP_NOT: begin
-					end
-					`OP_MVC: begin
-						write0  <= 1;
-						srcreg0 <= op[`ARG_DST];
-						srcval0 <= op[`ARG_NUM];
-					end
-					`OP_CALL: begin
 					end
 					`OP_NOP: begin
 					end
