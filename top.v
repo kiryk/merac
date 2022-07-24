@@ -27,9 +27,9 @@ module t (/*AUTOARG*/
 	integer i;
 	initial for (i = 0; i < 2**`WIDTH_DOUBLE; i = i + 1) begin
 		case (i)
-		7:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd1, 8'd8};
-		9:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd3, 8'd5};
-		11: {mem[i], mem[i-1]} = {`OP_ADD, 4'd2, 4'd3, 4'd1};
+		1:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd1, 8'd0};
+		3:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd2, 8'd1};
+		5:  {mem[i], mem[i-1]} = {`OP_ADD, 4'd2, 4'd3, 4'd1};
 		default: mem[i] = 0;
 		endcase
 	end

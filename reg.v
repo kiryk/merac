@@ -21,10 +21,7 @@ module registers (clk, write0, write1, //pc,
   integer i;
   initial begin
     for (i = 0; i < 16; i = i + 1) begin
-      if (i == 14)
-        regs[i] = 6;
-      else
-        regs[i] = 0;
+      regs[i] = 0;
     end
   end
 
