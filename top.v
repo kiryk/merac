@@ -95,6 +95,12 @@ module t (/*AUTOARG*/
 					`OP_CALL: begin
 					end
 					`OP_MVD: begin
+						write0 <= 1;
+						write1 <= 1;
+						srcreg0 <= (op[`ARG_DST] + 0);
+						srcreg1 <= (op[`ARG_DST] + 1);
+						srcval0 <= dstval0;
+						srcval1 <= dstval1;
 					end
 					`OP_EQ: begin
 					end
