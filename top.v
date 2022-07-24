@@ -92,7 +92,7 @@ module t (/*AUTOARG*/
 						dstreg0 <= op[`ARG_SRC0];
 						dstreg1 <= op[`ARG_SRC1];
 
-						write0  <= 1'b1;
+						write0  <= 1;
 						srcreg0 <= op[`ARG_DST];
 						srcval0 <= retval;
 					end
@@ -105,7 +105,7 @@ module t (/*AUTOARG*/
 					`OP_NOT: begin
 					end
 					`OP_MVC: begin
-						write0  <= 1'b1;
+						write0  <= 1;
 						srcreg0 <= op[`ARG_DST];
 						srcval0 <= op[`ARG_NUM];
 					end
