@@ -103,11 +103,11 @@ module t (/*AUTOARG*/
 						dstval1 <= argval1;
 					end
 					`OP_EQ: begin
-						if (!(argval0 == argval1))
+						if (argval0 != argval1)
 							pc <= pc + 2;
 					end
 					`OP_LT: begin
-						if (!(argval0 < argval1))
+						if (argval0 >= argval1)
 							pc <= pc + 2;
 					end
 					`OP_CND: begin
