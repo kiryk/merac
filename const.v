@@ -3,11 +3,10 @@
 `define WIDTH_DOUBLE (2*`WIDTH_WORD)
 `define WIDTH_INST   WIDTH_DOUBLE
 
-`define STATE_FETCHPC 0
-`define STATE_FETCHOP 1
+`define STATE_PREPARE 0
+`define STATE_FETCH   1
 `define STATE_DECODE  2
 `define STATE_EXECUTE 3
-`define STATE_STOREPC 4
 
 `define OP_HLT  4'b0000
 `define OP_ST   4'b0001

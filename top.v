@@ -19,7 +19,7 @@ module t (/*AUTOARG*/
   input clk;
 
   reg [7:0] mem [2**`WIDTH_DOUBLE-1:0];
-  reg [2:0] state = `STATE_FETCHPC;
+  reg [1:0] state = `STATE_PREPARE;
   reg [`WIDTH_DOUBLE-1:0] pc;
   reg [`WIDTH_DOUBLE-1:0] op;
 
@@ -44,8 +44,8 @@ module t (/*AUTOARG*/
   reg  [`WIDTH_SEG-1:0]    dstreg1;
   reg  [`WIDTH_WORD-1:0]   dstval0;
   reg  [`WIDTH_WORD-1:0]   dstval1;
-  reg  [`WIDTH_SEG-1:0]    argreg0 = 14;
-  reg  [`WIDTH_SEG-1:0]    argreg1 = 15;
+  reg  [`WIDTH_SEG-1:0]    argreg0;
+  reg  [`WIDTH_SEG-1:0]    argreg1;
   wire [`WIDTH_WORD-1:0]   argval0;
   wire [`WIDTH_WORD-1:0]   argval1;
   wire [`WIDTH_DOUBLE-1:0] argval;
@@ -63,24 +63,32 @@ module t (/*AUTOARG*/
 
   always @(posedge clk) begin
     case (state)
-      `STATE_FETCHPC: begin
-        state  <= `STATE_FETCHOP;
-        write0 <= 0;
-        write1 <= 0;
+      `STATE_PREPARE: begin
+        state <= `STATE_FETCH;
+        argreg0 <= 14;
+        argreg1 <= 15;
       end
-      `STATE_FETCHOP: begin
-        state <= `STATE_DECODE;
-        pc    <= {argval};
-        op    <= {mem[argval+1], mem[argval]};
+      `STATE_FETCH: begin
+        state  <= `STATE_DECODE;
+        pc     <= argval;
+        op     <= {mem[argval+1], mem[argval]};
+
+        write0 <= 1;
+        write1 <= 1;
+        dstreg0 <= 14;
+        dstreg1 <= 15;
+        {dstval1, dstval0} <= argval + 2;
       end
       `STATE_DECODE: begin
         $display("pc: %d, op: %b", pc, op);
         state   <= `STATE_EXECUTE;
+        write0  <= 0;
+        write1  <= 0;
         argreg0 <= op[`ARG_SRC0];
         argreg1 <= op[`ARG_SRC1];
       end
       `STATE_EXECUTE: begin
-        state <= `STATE_STOREPC;
+        state <= `STATE_PREPARE;
         case (op[`ARG_OPC])
           `OP_HLT: begin
             pc <= pc - 2;
@@ -107,21 +115,34 @@ module t (/*AUTOARG*/
             dstreg1 <= op[`ARG_DST] + 1;
             dstval0 <= argval0;
             dstval1 <= argval1;
-            if (op[`ARG_DST] >= 14)
-              pc <= argval - 2;
           end
           `OP_EQ: begin
-            if (argval0 != argval1)
-              pc <= pc + 2;
+            if (argval0 != argval1) begin
+              write0 <= 1;
+              write1 <= 1;
+              dstreg0 <= 14;
+              dstreg1 <= 15;
+              {dstval1, dstval0} <= pc + 4;
+            end
           end
           `OP_LT: begin
             $display("test if %d < %d", argval0, argval1);
-            if (argval0 >= argval1)
-              pc <= pc + 2;
+            if (argval0 >= argval1) begin
+              write0 <= 1;
+              write1 <= 1;
+              dstreg0 <= 14;
+              dstreg1 <= 15;
+              {dstval1, dstval0} <= pc + 4;
+            end
           end
           `OP_CND: begin
-            if (!carry)
-              pc <= pc + 2;
+            if (!carry) begin
+              write0 <= 1;
+              write1 <= 1;
+              dstreg0 <= 14;
+              dstreg1 <= 15;
+              {dstval1, dstval0} <= pc + 4;
+            end
           end
           `OP_ADD,
           `OP_SUB,
@@ -136,17 +157,6 @@ module t (/*AUTOARG*/
           `OP_NOP: begin
           end
         endcase
-      end
-      `STATE_STOREPC: begin
-        write0  <= 1;
-        write1  <= 1;
-        dstreg0 <= 14;
-        dstreg1 <= 15;
-        {dstval1, dstval0} <= pc + 2;
-
-        argreg0 <= 14;
-        argreg1 <= 15;
-        state <= `STATE_FETCHPC;
       end
     endcase
   end
