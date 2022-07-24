@@ -10,35 +10,35 @@
 `define MV   3'b101
 
 module alu (active, op, a, b, y, carry);
-	input  wire active;
-	input  wire [`WIDTH_OP-1:0]   op;
-	input  wire [`WIDTH_WORD-1:0] a;
-	input  wire [`WIDTH_WORD-1:0] b;
-	output reg  [`WIDTH_WORD-1:0] y;
-	output reg  carry;
+  input  wire active;
+  input  wire [`WIDTH_OP-1:0]   op;
+  input  wire [`WIDTH_WORD-1:0] a;
+  input  wire [`WIDTH_WORD-1:0] b;
+  output reg  [`WIDTH_WORD-1:0] y;
+  output reg  carry;
 
-	/* verilator lint_off CASEINCOMPLETE */
-	always @(op, a, b) begin
-		if (active) case (op)
-			`ADD: begin
-				{carry, y} = a + b;
-			end
-			`SUB: begin
-				{carry, y} = a - b;
-			end
-			`AND: begin
-				{carry, y} = {|y, a & b};
-			end
-			`OR: begin
-				{carry, y} = {|y, a | b};
-			end
-			`NOT: begin
-				{carry, y} = {|y, ~a};
-			end
-			`MV: begin
-				{carry, y} = {|y, a};
-			end
-		endcase
-	end
-	/* verilator lint_on CASEINCOMPLETE */
+  /* verilator lint_off CASEINCOMPLETE */
+  always @(op, a, b) begin
+    if (active) case (op)
+      `ADD: begin
+        {carry, y} = a + b;
+      end
+      `SUB: begin
+        {carry, y} = a - b;
+      end
+      `AND: begin
+        {carry, y} = {|y, a & b};
+      end
+      `OR: begin
+        {carry, y} = {|y, a | b};
+      end
+      `NOT: begin
+        {carry, y} = {|y, ~a};
+      end
+      `MV: begin
+        {carry, y} = {|y, a};
+      end
+    endcase
+  end
+  /* verilator lint_on CASEINCOMPLETE */
 endmodule
