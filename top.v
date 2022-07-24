@@ -22,7 +22,6 @@ module t (/*AUTOARG*/
   reg [2:0] state = `STATE_FETCHPC;
   reg [`WIDTH_DOUBLE-1:0] pc;
   reg [`WIDTH_DOUBLE-1:0] op;
-  reg [`WIDTH_DOUBLE-1:0] addr;
 
   integer i;
   initial for (i = 0; i < 2**`WIDTH_DOUBLE; i = i + 1) begin
