@@ -27,9 +27,15 @@ module t (/*AUTOARG*/
 	integer i;
 	initial for (i = 0; i < 2**`WIDTH_DOUBLE; i = i + 1) begin
 		case (i)
-		1:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd1, 8'd0};
-		3:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd2, 8'd1};
-		5:  {mem[i], mem[i-1]} = {`OP_ADD, 4'd2, 4'd3, 4'd1};
+		1:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd1,  8'd8};
+		3:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd2,  8'd100};
+		5:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd3,  8'd0};
+		7:  {mem[i], mem[i-1]} = {`OP_MVC, 4'd4,  8'd1};
+		9:  {mem[i], mem[i-1]} = {`OP_MVD, 4'd3,  4'd4, 4'd3};
+		11: {mem[i], mem[i-1]} = {`OP_ADD, 4'd3,  4'd4, 4'd3};
+		13: {mem[i], mem[i-1]} = {`OP_LT,  4'd0,  4'd3, 4'd2};
+		15: {mem[i], mem[i-1]} = {`OP_MVD, 4'd14, 4'd1, 4'd0};
+		17: {mem[i], mem[i-1]} = {`OP_HLT, 4'd0,  4'd0, 4'd0};
 		default: mem[i] = 0;
 		endcase
 	end
@@ -69,6 +75,7 @@ module t (/*AUTOARG*/
 				op    <= {mem[argval+1], mem[argval]};
 			end
 			`STATE_DECODE: begin
+				$display("pc: %d, op: %b", pc, op);
 				state   <= `STATE_EXECUTE;
 				argreg0 <= op[`ARG_SRC0];
 				argreg1 <= op[`ARG_SRC1];
@@ -97,16 +104,19 @@ module t (/*AUTOARG*/
 					`OP_MVD: begin
 						write0 <= 1;
 						write1 <= 1;
-						dstreg0 <= (op[`ARG_DST] + 0);
-						dstreg1 <= (op[`ARG_DST] + 1);
+						dstreg0 <= op[`ARG_DST] + 0;
+						dstreg1 <= op[`ARG_DST] + 1;
 						dstval0 <= argval0;
 						dstval1 <= argval1;
+						if (op[`ARG_DST] >= 14)
+							pc <= argval - 2;
 					end
 					`OP_EQ: begin
 						if (argval0 != argval1)
 							pc <= pc + 2;
 					end
 					`OP_LT: begin
+						$display("test if %d < %d", argval0, argval1);
 						if (argval0 >= argval1)
 							pc <= pc + 2;
 					end
@@ -116,6 +126,7 @@ module t (/*AUTOARG*/
 					end
 					`OP_ADD,
 					`OP_SUB,
+					`OP_AND,
 					`OP_OR,
 					`OP_NOT,
 					`OP_MV: begin
