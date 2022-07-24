@@ -20,24 +20,12 @@ module alu (active, op, a, b, y, carry);
   /* verilator lint_off CASEINCOMPLETE */
   always @(op, a, b) begin
     if (active) case (op)
-      `ADD: begin
-        {carry, y} = a + b;
-      end
-      `SUB: begin
-        {carry, y} = a - b;
-      end
-      `AND: begin
-        {carry, y} = {|y, a & b};
-      end
-      `OR: begin
-        {carry, y} = {|y, a | b};
-      end
-      `NOT: begin
-        {carry, y} = {|y, ~a};
-      end
-      `MV: begin
-        {carry, y} = {|y, a};
-      end
+    `ADD: {carry, y} = a + b;
+    `SUB: {carry, y} = a - b;
+    `AND: {carry, y} = {|y, a & b};
+    `OR:  {carry, y} = {|y, a | b};
+    `NOT: {carry, y} = {|y, ~a};
+    `MV:  {carry, y} = {|y, a};
     endcase
   end
   /* verilator lint_on CASEINCOMPLETE */
